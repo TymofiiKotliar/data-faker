@@ -1,0 +1,6 @@
+# Ignore everything
+*
+!.gitignore
+!README.md
+!seed.py
+!requirements.txt
