@@ -195,7 +195,7 @@ for guest_id in GUEST_IDS:
 # These are generated together because PaymentRecord references Reservation IDs
 # that are only known at generation time.
 START_DATE = date(2024, 1, 1)
-END_DATE   = date(2026, 4, 1)
+END_DATE   = date(2026, 8, 1)
 TODAY      = date(2026, 4, 28)
 
 # Pareto weights: ~20% of guests receive ~80% of reservations
@@ -218,7 +218,7 @@ for room_num in ROOM_NUMBERS:
         if cursor >= END_DATE:
             break
 
-        stay      = timedelta(days=random.randint(1, 14))
+        stay      = timedelta(days=random.randint(1, 21))
         check_in  = cursor
         check_out = cursor + stay
         if check_out > END_DATE:
@@ -301,7 +301,6 @@ for r_id in reviewed_ids:
 
 
 # WRITE
-
 with open("seed.sql", "w", encoding="utf-8", newline="\n") as f:
     f.write("BEGIN;\n")
 
