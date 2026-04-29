@@ -147,18 +147,71 @@ for _ in range(GUEST_COUNT):
 GUEST_IDS = list(range(1, GUEST_COUNT + 1))
 
 # ── Address ───────────────────────────────────────────────────────────────────
+# (locale, has_administrative_region)
+LOCALE_MAP = {
+    "United States":  ("en_US", True),
+    "United Kingdom": ("en_GB", False),
+    "Germany":        ("de_DE", False),
+    "France":         ("fr_FR", False),
+    "Italy":          ("it_IT", False),
+    "Spain":          ("es_ES", False),
+    "Netherlands":    ("nl_NL", False),
+    "Poland":         ("pl_PL", False),
+    "Czech Republic": ("cs_CZ", False),
+    "Slovakia":       ("sk_SK", False),
+    "Ukraine":        ("uk_UA", False),
+    "Brazil":         ("pt_BR", True),
+    "Australia":      ("en_AU", True),
+    "Canada":         ("en_CA", True),
+    "Sweden":         ("sv_SE", False),
+    "Norway":         ("no_NO", False),
+    "Denmark":        ("da_DK", False),
+}
+
+# Pre-build one Faker per locale
+locale_fakers = {}
+for locale, _ in LOCALE_MAP.values():
+    lf = Faker(locale)
+    lf.seed_instance(SEED)
+    locale_fakers[locale] = lf
+
+COUNTRIES = list(LOCALE_MAP.keys())
+# Weighted — biased toward more common travel origins
+COUNTRY_WEIGHTS = [20, 15, 10, 10, 8, 8, 5, 5, 5, 5, 5, 4, 4, 4, 2, 2, 2]
+
 ADDRESS    = []
 ADDRESS_ID = range(1, 1001)
 
 for _ in ADDRESS_ID:
+    country            = random.choices(COUNTRIES, weights=COUNTRY_WEIGHTS)[0]
+    locale, has_region = LOCALE_MAP[country]
+    lf                 = locale_fakers[locale]
+
+    region = None
+    if has_region and random.random() > 0.25:
+        try:
+            region = lf.state()[:85]
+        except AttributeError:
+            pass
+
+    try:
+        street = lf.street_name()[:60]
+    except AttributeError:
+        street = fake.street_name()[:60]   # fallback to en_US
+
+    try:
+        postcode = lf.postcode()[:9]
+    except AttributeError:
+        postcode = fake.postcode()[:9]
+
     ADDRESS.append([
-        fake.country(),
-        fake.state() if random.random() > 0.25 else None,
-        fake.city(),
-        fake.street_name()[:60],
+        country,
+        region,
+        lf.city()[:168],
+        street,
         fake.building_number(),
         fake.secondary_address()[:10] if random.random() > 0.08 else None,
-        fake.postcode()[:9],
+        postcode,
     ])
 
 # GuestAddress
