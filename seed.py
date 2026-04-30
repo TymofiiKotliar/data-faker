@@ -187,7 +187,7 @@ for _ in ADDRESS_ID:
     locale, has_region = LOCALE_MAP[country]
     lf                 = locale_fakers[locale]
 
-    region = None
+    region = ""
     if has_region and random.random() > 0.25:
         try:
             region = lf.state()[:85]
@@ -210,7 +210,7 @@ for _ in ADDRESS_ID:
         lf.city()[:168],
         street,
         fake.building_number(),
-        fake.secondary_address()[:10] if random.random() > 0.08 else None,
+        fake.secondary_address()[:10] if random.random() > 0.08 else "",
         postcode,
     ])
 
